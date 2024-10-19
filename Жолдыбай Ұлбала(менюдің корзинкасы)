@@ -1,0 +1,142 @@
+using System;
+using System.Collections.Generic;
+
+namespace RestaurantSupportService
+{
+    public class Dish
+    {
+        public string Name { get; }
+        public decimal Price { get; }
+
+        public Dish(string name, decimal price)
+        {
+            Name = name;
+            Price = price;
+        }
+    }
+
+    public class Basket
+    {
+        private List<Dish> dishes = new List<Dish>();
+
+        public void AddDish(Dish dish)
+        {
+            dishes.Add(dish);
+            Console.WriteLine($"'{dish.Name}' добавлено в корзину.");
+        }
+
+        public void RemoveDish(string dishName)
+        {
+            var dishToRemove = dishes.Find(d => d.Name.Equals(dishName, StringComparison.OrdinalIgnoreCase));
+            if (dishToRemove != null)
+            {
+                dishes.Remove(dishToRemove);
+                Console.WriteLine($"'{dishToRemove.Name}' удалено из корзины.");
+            }
+            else
+            {
+                Console.WriteLine("Неверное название блюда. Блюдо не найдено в корзине.");
+            }
+        }
+
+        public void ShowItems(string language)
+        {
+            if (dishes.Count == 0)
+            {
+                Console.WriteLine(language == "ru" ? "Корзина пуста." : "Себет бос.");
+                return;
+            }
+
+            Console.WriteLine(language == "ru" ? "Содержимое корзины:" : "Себеттегі тағамдар:");
+            foreach (var dish in dishes)
+            {
+                Console.WriteLine($"- {dish.Name}: {dish.Price:C}");
+            }
+        }
+
+        public decimal GetTotalPrice()
+        {
+            decimal total = 0;
+            foreach (var dish in dishes)
+            {
+                total += dish.Price;
+            }
+            return total;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Выберите язык / Тілді таңдаңыз (ru/kz):");
+            string language = Console.ReadLine().ToLower() == "kz" ? "kz" : "ru";
+
+            var basket = new Basket();
+
+            while (true)
+            {
+                Console.WriteLine(language == "ru" ? "Добро пожаловать в службу поддержки ресторана!" : "Ресторан қызмет көрсету қызметіне қош келдіңіз!");
+                Console.WriteLine(language == "ru" ? "1. Заказать блюдо" : "1. Тағамды тапсырыс беру");
+                Console.WriteLine(language == "ru" ? "2. Удалить блюдо из корзины" : "2. Себеттен тағамды жою");
+                Console.WriteLine(language == "ru" ? "3. Показать корзину" : "3. Себетті көрсету");
+                Console.WriteLine(language == "ru" ? "4. Выход" : "4. Шығу");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        Console.WriteLine(language == "ru" ? "Введите название блюда для заказа (Пицца, Паста, Салат, Бургер, Десерт):" : "Тапсырыс беру үшін тағамның атын енгізіңіз (Пицца, Паста, Салат, Бургер, Десерт):");
+                        string dishName = Console.ReadLine();
+                        decimal price = 0;
+
+                        switch (dishName.ToLower())
+                        {
+                            case "пицца":
+                                price = 8.99m;
+                                break;
+                            case "паста":
+                                price = 7.50m;
+                                break;
+                            case "салат":
+                                price = 5.00m;
+                                break;
+                            case "бургер":
+                                price = 6.50m;
+                                break;
+                            case "десерт":
+                                price = 4.00m;
+                                break;
+                            default:
+                                Console.WriteLine(language == "ru" ? "Неверное название блюда." : "Неправиль тағам аты.");
+                                continue;
+                        }
+
+                        var newDish = new Dish(dishName, price);
+                        basket.AddDish(newDish);
+                        break;
+
+                    case "2":
+                        Console.WriteLine(language == "ru" ? "Введите название блюда для удаления из корзины:" : "Себеттен жою үшін тағамның атын енгізіңіз:");
+                        string removeDishName = Console.ReadLine();
+                        basket.RemoveDish(removeDishName);
+                        break;
+
+                    case "3":
+                        basket.ShowItems(language);
+                        Console.WriteLine($"{(language == "ru" ? "Общая стоимость" : "Жалпы бағасы")}: {basket.GetTotalPrice():C}");
+                        break;
+
+                    case "4":
+                        Console.WriteLine(language == "ru" ? "Спасибо, что пользуетесь услугами нашего ресторана! До свидания." : "Біздің мейрамхананың қызметтерін пайдаланғаныңыз үшін рахмет! Сау болыңыз.");
+                        return;
+
+                    default:
+                        Console.WriteLine(language == "ru" ? "Неверный выбор. Пожалуйста, попробуйте снова." : "Неправиль таңдау. Қайтадан әрекет жасаңыз.");
+                        break;
+                }
+            }
+        }
+    }
+}
